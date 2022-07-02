@@ -2,7 +2,7 @@
 
 ![Q20220703020037|331x400](https://github.com/negbook/nb-menu/blob/main/preview.png?raw=true)
 
-All the menu functions is in the examples and the example scripts this topic below
+All the menu functions is in the examples 
 ## basic build
 ```
 local menu
