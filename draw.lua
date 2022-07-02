@@ -234,7 +234,7 @@ function DrawMenu(max_slots,x,y)
                     local tr,tg,tb,ta = r0,g0,b0,a0
                     local rr,rg,rb,ra = r0,g0,b0,a0
                     local textcolor = 0 
-
+                    local isthisselected = (hightlighted == i)
                     local by = buttonheight * n + recty + buttonheight / 2
                     if not slotfound and cursorsupported and csx > bx and csx < bx + bw and csy > by  and csy < by + bh then 
                         slotfound = i 
@@ -260,7 +260,8 @@ function DrawMenu(max_slots,x,y)
                             EndTextCommandDisplayText(csx + tipsoffset, csy + tipsoffset)
                         end 
                     end 
-                    if hightlighted == i then 
+                    
+                    if isthisselected then 
                         DrawSprite(CommonMenu, "Gradient_Nav",rectx, by , menuwidth, buttonheight,0, r0, g0, b0, 220)
                         textcolor = 2
                         rr,rg,rb,ra = r2,g2,b2,a2
@@ -289,10 +290,10 @@ function DrawMenu(max_slots,x,y)
                         SetTextFont(buttonFont)
                         SetTextScale(1.0, buttonheight*10)
                         AddTextComponentSubstringPlayerName(optionselectiontext)
-                        EndTextCommandDisplayText(basex + menuwidth - optionselectiontextwidth - (buttonTextXOffset * 3)  , recty + buttonheight * n )
+                        EndTextCommandDisplayText(basex + menuwidth - optionselectiontextwidth - (buttonTextXOffset * (isthisselected and 3 or 1.5))  , recty + buttonheight * n )
                         
                     end 
-                    local icon = buttons[i]("icon",hightlighted == i)
+                    local icon = buttons[i]("icon",isthisselected)
                     if icon then 
                         --DrawSprite(CommonMenu, icon ,basex + menuwidth - buttonheight - (buttonTextXOffset * 3)  , recty + buttonheight * n, buttonheight/AspectRatio, buttonheight,0, rr,rg,rb,ra)
                         
