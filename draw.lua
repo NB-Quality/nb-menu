@@ -520,7 +520,7 @@ function DrawMenu(max_slots,x,y)
                 if onaction then onaction(value,c,d,...) end 
             else
                 if not action then
-                    if onaction then onaction(itemname,selected,selected and (options or e)[selected]) end 
+                    if onaction then onaction(itemname,selected,(selected and (optiontext or e)[selected])) end 
                 else 
 
                     if type(action) == "string" then 
