@@ -1,8 +1,9 @@
 # nb-menu
 
 ![Q20220703020037|331x400](https://github.com/negbook/nb-menu/blob/main/preview.png?raw=true)
-
-All the menu functions is in the examples 
+A menu framework full respected with game base method,
+coding with as optimistic as possible,
+all the menu functions is in the examples 
 ## basic build
 ```
 local menu
@@ -100,4 +101,24 @@ local menu2;menu2 = Menu(7,0.085,0.096)
     menu2.style.settitlebackground('shopui_title_auto_shop', 'shopui_title_auto_shop')
     menu2.setcursor(true) -- set the menu is mouse supported, it will cost only 0.01~0.02 ms more
     menu2.setcursortips(1,"hello")  -- we can set the mouse hover tips on a button
+```
+
+
+## buttons params
+```
+button label,
+button options table, the elements format: (normal = option items, number = iconid, table = actionable items)
+    - actionable items table format: (option item, description,action function)
+button description,
+button action function
+```
+
+## fxmanifest.lua
+```
+client_scripts {
+    '@nb-menu/nb-menu.lua',
+     'example.lua',
+}
+
+
 ```
