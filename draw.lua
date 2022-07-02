@@ -94,6 +94,9 @@ function DrawMenu(max_slots,x,y)
             color = x
             rc,gc,bc,ac = GetHudColour(color)
         end 
+        self.style.font = function(x)
+            buttonFont = x or 0
+        end 
         local titlealign = 0
         self.style.titlealign = function(x)
             titlealign = x
