@@ -76,6 +76,7 @@ function DrawMenu(max_slots,x,y)
     local self;self = {style = {}}
     local r0,g0,b0,a0 = GetHudColour(0)
     local r2,g2,b2,a2 = GetHudColour(2)
+    local r9,g9,b9,a9 = GetHudColour(9)
     
     local menuWidth = 0.240
     local titleHeight = 0.085
@@ -181,7 +182,8 @@ function DrawMenu(max_slots,x,y)
                 
                 BeginTextCommandDisplayText(STRING)
                 SetTextDropShadow(2, 2, 0, 0, 0)
-                SetColourOfNextTextComponent(0)
+                --SetColourOfNextTextComponent(0)
+                SetTextColour(r0, g0, b0, a0)
                 SetTextFont(buttonFont)
                 SetTextScale(1.0, titleheight*10)
                 AddTextComponentSubstringPlayerName(title)
@@ -197,7 +199,8 @@ function DrawMenu(max_slots,x,y)
                 
                 DrawRect(rectx, recty + buttonheight/2, menuwidth, buttonheight, rm,gm,bm,255)
                 BeginTextCommandDisplayText(STRING)
-                SetColourOfNextTextComponent(0)
+                --SetColourOfNextTextComponent(0)
+                SetTextColour(r0, g0, b0, a0)
                 SetTextFont(buttonFont)
                 SetTextScale(1.0, buttonheight*10)
                 AddTextComponentSubstringPlayerName(subtitle)
@@ -207,7 +210,8 @@ function DrawMenu(max_slots,x,y)
                 BeginTextCommandDisplayText(STRING)
                 SetTextWrap(basex, basex + menuwidth - buttonTextXOffset)
                 SetTextRightJustify(2)
-                SetColourOfNextTextComponent(9)
+                --SetColourOfNextTextComponent(9)
+                SetTextColour(r9, g9, b9, a9)
                 SetTextFont(buttonFont)
                 SetTextScale(1.0, buttonheight*10)
                 AddTextComponentSubstringPlayerName(hightlighted .. ' / '..buttonslots)
@@ -252,7 +256,8 @@ function DrawMenu(max_slots,x,y)
                             
                             DrawSprite(CommonMenu, "Gradient_Bgd",csx + tipswidth/2 + tipsoffset, csy + (buttonheight + extend)/2 + tipsoffset, tipswidth, buttonheight + extend,0, r0, g0, b0, 100)
                             BeginTextCommandDisplayText(STRING)
-                            SetColourOfNextTextComponent(0)
+                            --SetColourOfNextTextComponent(0)
+                            SetTextColour(r0, g0, b0, a0)
                             SetTextFont(buttonFont)
                             SetTextScale(1.0, buttonheight*10)
                             if k > 0 then 
@@ -267,6 +272,7 @@ function DrawMenu(max_slots,x,y)
                     if isthisselected then 
                         DrawSprite(CommonMenu, "Gradient_Nav",rectx, by , menuwidth, buttonheight,0, r0, g0, b0, 220)
                         textcolor = 2
+                        tr,tg,tb,ta = r2,g2,b2,a2
                         rr,rg,rb,ra = r2,g2,b2,a2
                         if current_option_string then 
 
@@ -327,7 +333,8 @@ function DrawMenu(max_slots,x,y)
                     
                     DrawSprite(CommonMenu, "Gradient_Bgd",rectx, recty + (buttonheight + extend)/2, menuwidth, buttonheight + extend,0, r0, g0, b0, a0)
                     BeginTextCommandDisplayText(STRING)
-                    SetColourOfNextTextComponent(0)
+                    --SetColourOfNextTextComponent(0)
+                    SetTextColour(r0, g0, b0, a0)
                     SetTextFont(buttonFont)
                     SetTextScale(1.0, buttonheight*10)
                     if k > 0 then 
