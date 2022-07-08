@@ -196,7 +196,7 @@ function DrawMenu(max_slots,x,y)
         AspectRatio = GetAspectRatio(false)
         isrendering = isrender
         if isrender and not Loop then 
-            Loop = PepareLoop(0)
+            Loop = LoopParty(0)
             texture = CommonMenu
             if not HasStreamedTextureDictLoaded(texture) then 
                 RequestStreamedTextureDict(texture)
