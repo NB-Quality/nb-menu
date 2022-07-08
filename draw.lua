@@ -68,58 +68,28 @@ local GetIconTexture = function(iconid, highlighted) --max:61 dont use it in loo
 	return highlighted and icons[iconid][2] or icons[iconid][1]
 end
 
-local game = GetGameName()
-if game == "redm" then 
-    GetAspectRatio = function(...)
 
-        return AspectRatio
-    end 
-    GetHudColour = function(...)
-        return Citizen.InvokeNative(GetHashKey("GET_HUD_COLOUR") & 0xFFFFFFFF,...)
-    end 
-    SetTextFont = SetTextFontForCurrentCommand
-    
-end 
 
 local function drawTxt(text, x, y, font, scale, center, shadow, alignRight, r,g,b,a, warp1,warp2)
-    if game == "redm" then 
-        local str = CreateVarString(10, "LITERAL_STRING", text)
-        if r then
-            SetTextColor(r,g,b,a)
-        else
-            SetTextColor(255, 255, 255, 255)
-        end
-        SetTextFontForCurrentCommand(font)
-        SetTextScale(scale, scale)
-        if shadow then
-            SetTextDropshadow(1, 0, 0, 0, 255)
-        end
-        if center then
-            SetTextCentre(center)
-        end
-        DisplayText(str, x, y)
-    else 
-        BeginTextCommandDisplayText(STRING)
-        SetTextColour(r,g,b,a)
-        SetTextFont(font)
-        SetTextScale(1.0, scale)
-        if shadow then
-            SetTextDropshadow(1, 0, 0, 0, 255)
-        end
-        
-        if center then
-            SetTextCentre(center)
-        end
-        if warp1 then 
-            SetTextWrap(warp1,warp2)
-        end 
-        if alignRight then 
-            SetTextRightJustify(2)
-        end 
-        AddTextComponentSubstringPlayerName(text)
-        EndTextCommandDisplayText(x,y)
+    BeginTextCommandDisplayText(STRING)
+    SetTextColour(r,g,b,a)
+    SetTextFont(font)
+    SetTextScale(1.0, scale)
+    if shadow then
+        SetTextDropshadow(1, 0, 0, 0, 255)
+    end
+    
+    if center then
+        SetTextCentre(center)
+    end
+    if warp1 then 
+        SetTextWrap(warp1,warp2)
     end 
-
+    if alignRight then 
+        SetTextRightJustify(2)
+    end 
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandDisplayText(x,y)
 end
 
 
@@ -149,9 +119,14 @@ function DrawMenu(max_slots,x,y)
     
     --styles 
         local color,rc,gc,bc,ac 
-        self.style.color = function(x)
-            color = x
-            rc,gc,bc,ac = GetHudColour(color)
+        self.style.color = function(x,...)
+            local r,g,b,a = x,...
+            if not g then 
+                color = x
+                rc,gc,bc,ac = GetHudColour(color)
+            else 
+                rc,gc,bc,ac = r,g,b,a
+            end 
         end 
         self.style.font = function(x)
             buttonFont = x or 0
@@ -162,7 +137,9 @@ function DrawMenu(max_slots,x,y)
         end 
         local titlebackground = {CommonMenu, "interaction_bgd"}
         self.style.settitlebackground = function(x,y)
-            RequestStreamedTextureDict(x)
+            if not HasStreamedTextureDictLoaded(x) then 
+                RequestStreamedTextureDict(x)
+            end 
             titlebackground = {x,y}
             color,rc,gc,bc,ac = nil
         end 
@@ -221,8 +198,10 @@ function DrawMenu(max_slots,x,y)
         if isrender and not Loop then 
             Loop = PepareLoop(0)
             texture = CommonMenu
-            RequestStreamedTextureDict(texture)
-            
+            if not HasStreamedTextureDictLoaded(texture) then 
+                RequestStreamedTextureDict(texture)
+            end 
+ 
             Loop(function(duration)
                 
                 if not isrendering or not opened then return duration("kill") end 
@@ -237,21 +216,6 @@ function DrawMenu(max_slots,x,y)
                 else
                     DrawSprite(titlebackground[1], titlebackground[2] ,rectx, recty + titleheight/2, menuwidth, titleheight,0, r0, g0, b0, a0)
                 end 
-                --[[
-                BeginTextCommandDisplayText(STRING)
-                SetTextDropShadow(2, 2, 0, 0, 0)
-                SetTextColour(r0,g0,b0,a0)
-                SetTextFont(buttonFont)
-                SetTextScale(1.0, titleheight*10)
-                AddTextComponentSubstringPlayerName(title)
-                SetTextWrap(basex,basex + menuwidth)
-                if titlealign == 1 then 
-                    SetTextCentre(true)
-                    EndTextCommandDisplayText(basex + menuwidth/2, recty + titleheight/5)
-                else 
-                    SetTextRightJustify(titlealign)
-                    EndTextCommandDisplayText(buttonTextXOffset+basex, recty + titleheight/5)
-                end --]]
 
                 if titlealign == 1 then 
                     drawTxt(title, basex + menuwidth/2, recty + titleheight/5, buttonFont, titleheight*10, titlealign == 1, true, false, r0,g0,b0,a0,basex,basex + menuwidth)
@@ -263,28 +227,11 @@ function DrawMenu(max_slots,x,y)
                 recty = recty + titleheight
                 
                 DrawRect(rectx, recty + buttonheight/2, menuwidth, buttonheight, rm,gm,bm,255)
-                --[[
-                BeginTextCommandDisplayText(STRING)
-                SetTextColour(r0,g0,b0,a0)
-                SetTextFont(buttonFont)
-                SetTextScale(1.0, buttonheight*10)
-                AddTextComponentSubstringPlayerName(subtitle)
-                EndTextCommandDisplayText(basex + buttonTextXOffset, recty )
-                --]]
-                drawTxt(subtitle, buttonTextXOffset+basex, recty, buttonFont, buttonheight*10, titlealign == 1, true, false, r0,g0,b0,a0)
+
+                drawTxt(subtitle, buttonTextXOffset+basex, recty, buttonFont, buttonheight*10, false, true, false, r0,g0,b0,a0)
                 
                 if isscroll then 
-                    --[[
-                    BeginTextCommandDisplayText(STRING)
-                    SetTextWrap(basex, basex + menuwidth - buttonTextXOffset)
-                    SetTextRightJustify(2)
-                    SetTextColour(r9,g9,b9,a9)
-                    SetTextFont(buttonFont)
-                    SetTextScale(1.0, buttonheight*10)
-                    AddTextComponentSubstringPlayerName(hightlighted .. ' / '..buttonslots)
-                    EndTextCommandDisplayText(basex + menuwidth, recty )
-                    --]]
-                    drawTxt(hightlighted .. ' / '..buttonslots, basex + menuwidth, recty, buttonFont, buttonheight*10, titlealign == 1, true, true, r9,g9,b9,a9, basex, basex + menuwidth - buttonTextXOffset)
+                    drawTxt(hightlighted .. ' / '..buttonslots, basex + menuwidth, recty, buttonFont, buttonheight*10, false, true, true, r9,g9,b9,a9, basex, basex + menuwidth - buttonTextXOffset)
                 end 
                 recty = recty + buttonheight 
                 local slots = (buttonslots > maxslots and maxslots or buttonslots)
@@ -323,19 +270,7 @@ function DrawMenu(max_slots,x,y)
                             local extend = (k - 1) * tipsheight + (k > 1 and tipsheight/2 or 0)
                             
                             DrawSprite(CommonMenu, "Gradient_Bgd",csx + tipswidth/2 + tipsoffset, csy + (buttonheight + extend)/2 + tipsoffset, tipswidth, buttonheight + extend,0, r0, g0, b0, 100)
-                            --[[
-                            BeginTextCommandDisplayText(STRING)
-                            SetTextColour(r0,g0,b0,a0)
-                            SetTextFont(buttonFont)
-                            SetTextScale(1.0, buttonheight*10)
-                            if k > 0 then 
-                                SetTextWrap(csx + tipsoffset, csx + tipsoffset + menuwidth )
-                            end 
-                            AddTextComponentSubstringPlayerName(tips)
-                            
-                            EndTextCommandDisplayText(csx + tipsoffset, csy + tipsoffset)
-                            --]]
-                            drawTxt(tips, csx + tipswidth/2 + tipsoffset, csy + (buttonheight + extend)/2 + tipsoffset, buttonFont, buttonheight*10, titlealign == 1, true, false, r0,g0,b0,a0, k > 0 and csx + tipsoffset or basex, k > 0 and csx + tipsoffset + menuwidth or basex + menuwidth)
+                            drawTxt(tips, csx + tipswidth/2 + tipsoffset, csy + (buttonheight + extend)/2 + tipsoffset, buttonFont, buttonheight*10, false, true, false, r0,g0,b0,a0, k > 0 and csx + tipsoffset or basex, k > 0 and csx + tipsoffset + menuwidth or basex + menuwidth)
                         end 
                     end 
                     
@@ -352,36 +287,18 @@ function DrawMenu(max_slots,x,y)
                         end 
                     end 
                     
-                    --[[
-                    BeginTextCommandDisplayText(STRING)
-                    SetTextColour(rr,rg,rb,ra)
-                    SetTextFont(buttonFont)
-                    SetTextScale(1.0, buttonheight*10)
-                    AddTextComponentSubstringPlayerName(buttons[i]("item"))
-                    EndTextCommandDisplayText(basex + buttonTextXOffset, recty + buttonheight * n )
-                    --]]
-                    drawTxt(buttons[i]("item"), basex + buttonTextXOffset, recty + buttonheight * n, buttonFont, buttonheight*10, titlealign == 1, false, false, rr,rg,rb,ra)
+                    drawTxt(buttons[i]("item"), basex + buttonTextXOffset, recty + buttonheight * n, buttonFont, buttonheight*10, false, false, false, rr,rg,rb,ra)
                     
                     
                     local optionselectiontext,optionselectiontextwidth = buttons[i]("getoptionselectiontext")
                     
                     if optionselectiontext then 
-                        --[[
-                        BeginTextCommandDisplayText(STRING)
-                        SetTextColour(rr,rg,rb,ra)
-                        SetTextFont(buttonFont)
-                        SetTextScale(1.0, buttonheight*10)
-                        AddTextComponentSubstringPlayerName(optionselectiontext)
-                        EndTextCommandDisplayText(basex + menuwidth - optionselectiontextwidth - (buttonTextXOffset * (isthisselected and 3 or 1.5))  , recty + buttonheight * n )
-                        --]]
-                        drawTxt(optionselectiontext, basex + menuwidth - optionselectiontextwidth - (buttonTextXOffset * (isthisselected and 3 or 1.5))  , recty + buttonheight * n, buttonFont, buttonheight*10, titlealign == 1, false, false, rr,rg,rb,ra)
+                        drawTxt(optionselectiontext, basex + menuwidth - optionselectiontextwidth - (buttonTextXOffset * (isthisselected and 3 or 1.5))  , recty + buttonheight * n, buttonFont, buttonheight*10, false, false, false, rr,rg,rb,ra)
                         
                     end 
                     local icon = buttons[i]("icon",isthisselected)
                     if icon then 
-                        --DrawSprite(CommonMenu, icon ,basex + menuwidth - buttonheight - (buttonTextXOffset * 3)  , recty + buttonheight * n, buttonheight/AspectRatio, buttonheight,0, rr,rg,rb,ra)
-                        
-                        DrawSprite("CommonMenu", icon ,basex + menuwidth - (buttonTextXOffset * 2.5) ,recty + buttonheight * n + buttonheight/2, buttonheight/AspectRatio, buttonheight,0, r0, g0, b0, a0)
+                        DrawSprite(CommonMenu, icon ,basex + menuwidth - (buttonTextXOffset * 2.5) ,recty + buttonheight * n + buttonheight/2, buttonheight/AspectRatio, buttonheight,0, r0, g0, b0, a0)
                     end 
                     n = n + 1 
                 end 
@@ -389,12 +306,9 @@ function DrawMenu(max_slots,x,y)
                 recty = recty + buttonheight * slots 
                 
                 if isscroll then 
-                DrawRect(rectx, recty + buttonheight/2, menuwidth, buttonheight, rm,gm,bm,255)
-                DrawSprite(CommonMenu, "shop_arrows_upANDdown", rectx, recty + buttonheight/2 , buttonheight/AspectRatio, buttonheight, 0, r0, g0, b0, 255);
-                    --if current_option_string then 
-                    --DrawSprite(CommonMenu, "shop_arrows_upANDdown", rectx , recty + buttonheight/2 , buttonheight/AspectRatio, buttonheight, 90.0, r0, g0, b0, 255);
-                    --end 
-                recty = recty + buttonheight
+                    DrawRect(rectx, recty + buttonheight/2, menuwidth, buttonheight, rm,gm,bm,255)
+                    DrawSprite(CommonMenu, "shop_arrows_upANDdown", rectx, recty + buttonheight/2 , buttonheight/AspectRatio, buttonheight, 0, r0, g0, b0, 255);
+                    recty = recty + buttonheight
                 end 
                 
                 
@@ -407,18 +321,11 @@ function DrawMenu(max_slots,x,y)
                     local extend = (k - 1) * current_descriptionlineheight + (k > 1 and current_descriptionlineheight/2 or 0)
                     
                     DrawSprite(CommonMenu, "Gradient_Bgd",rectx, recty + (buttonheight + extend)/2, menuwidth, buttonheight + extend,0, r0, g0, b0, a0)
-                    --[[
-                    BeginTextCommandDisplayText(STRING)
-                    SetTextColour(r0,g0,b0,a0)
-                    SetTextFont(buttonFont)
-                    SetTextScale(1.0, buttonheight*10)
                     if k > 0 then 
-                        SetTextWrap(basex, basex + menuwidth)
+                        drawTxt(current_optiondescription or current_description, basex + buttonTextXOffset, recty, buttonFont, buttonheight*10, false, false, false, r0,g0,b0,a0, basex, basex + menuwidth)
+                    else 
+                        drawTxt(current_optiondescription or current_description, basex + buttonTextXOffset, recty, buttonFont, buttonheight*10, false, false, false, r0,g0,b0,a0)
                     end 
-                    AddTextComponentSubstringPlayerName(current_optiondescription or current_description)
-                    EndTextCommandDisplayText(basex + buttonTextXOffset, recty )
-                    --]]
-                    drawTxt(current_optiondescription or current_description, basex + buttonTextXOffset, recty, buttonFont, buttonheight*10, titlealign == 1, false, false, r0,g0,b0,a0, k > 0 and basex or basex + menuwidth, k > 0 and basex + menuwidth or basex + menuwidth)
                 end 
                
             end,function()
@@ -426,6 +333,7 @@ function DrawMenu(max_slots,x,y)
                 if HasStreamedTextureDictLoaded(texture) then 
                     SetStreamedTextureDictAsNoLongerNeeded(texture)
                 end 
+              
             end)
         end 
     end 
@@ -443,11 +351,9 @@ function DrawMenu(max_slots,x,y)
             local buttonheight = _(buttonHeight)
             SetTextFont(buttonFont)
             SetTextScale(1.0, buttonheight*10)
-            if game == "redm" then else 
             BeginTextCommandGetWidth(STRING)
             AddTextComponentSubstringPlayerName(current_option_string)
             current_optionwidth = EndTextCommandGetWidth(true)
-            end 
         end 
     end 
     local seticon = function(x)
@@ -459,12 +365,10 @@ function DrawMenu(max_slots,x,y)
             local buttonheight = _(buttonHeight)
             SetTextFont(buttonFont)
             SetTextScale(1.0, buttonheight*10)
-            if game == "redm" then else 
             BeginTextCommandGetWidth(STRING)
             AddTextComponentSubstringPlayerName(current_optiondescription)
             current_descriptionwidth = EndTextCommandGetWidth(true)
             current_descriptionlineheight = _(lineheight)
-            end 
         end 
     end 
     
@@ -499,15 +403,15 @@ function DrawMenu(max_slots,x,y)
                 options = opts 
                 for i,r in pairs(options) do 
                     local istable = type(r) == "table" and #r > 0
-                    local text = istable and r[1] or r  
+                    local text = istable and r[1] or r
+                    local text = tostring(text)
                     SetTextFont(buttonFont)
                     SetTextScale(1.0, _(buttonHeight)*10)
-                    if game == "redm" then else 
+                    
                     BeginTextCommandGetWidth(STRING)
                     AddTextComponentSubstringPlayerName(text)
                     optiontextwidth[i] = EndTextCommandGetWidth(true)
                     optiontext[i] = text
-                    end 
                 end 
                 selected = 1
             end 
@@ -548,12 +452,10 @@ function DrawMenu(max_slots,x,y)
                 local buttonheight = _(buttonHeight)
                 SetTextFont(buttonFont)
                 SetTextScale(1.0, buttonheight*10)
-                if game == "redm" then else 
                 BeginTextCommandGetWidth(STRING)
                 AddTextComponentSubstringPlayerName(current_description)
                 current_descriptionwidth = EndTextCommandGetWidth(true)
                 current_descriptionlineheight = _(lineheight)
-                end 
             end 
         end 
         
@@ -607,12 +509,10 @@ function DrawMenu(max_slots,x,y)
                 cursortips = value 
                 SetTextFont(buttonFont)
                 SetTextScale(1.0, _(buttonHeight)*10)
-                if game == "redm" then else 
                 BeginTextCommandGetWidth(STRING)
                 AddTextComponentSubstringPlayerName(cursortips)
                 cursortipswidth = EndTextCommandGetWidth(true)
-                cursortipsheight = GetRenderedCharacterHeight(_(buttonHeight)*10,buttonFont)
-                end 
+                cursortipsheight = GetRenderedCharacterHeight(_(buttonHeight)*10,buttonFont) 
             elseif action == "cb" then 
                 if onaction then onaction(value,c,d,...) end 
             else
